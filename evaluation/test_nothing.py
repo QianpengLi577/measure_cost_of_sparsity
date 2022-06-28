@@ -69,7 +69,7 @@ for i in range(len(fc2_weight)):
     for j in range(len(fc2_weight[i])):
         weight_all[j+784,i+784+128]=fc2_weight[i][j]
 
-th = 0.18
+th = 0.1
 index1 = np.abs(weight_all) >= th
 index2 = np.abs(weight_all) < th
 index = weight_all.copy()
