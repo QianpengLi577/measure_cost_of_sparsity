@@ -2,6 +2,9 @@ import numpy as np
 import torch
 from eval import *
 
+core_size = 100
+core_num = 10
+
 class SCNN(nn.Module):
     def __init__(self):
         super(SCNN, self).__init__()
@@ -32,7 +35,7 @@ class SCNN(nn.Module):
                 if len(index_x_)>0:
                     count_spike+=len(index_x_)
                     for j in range(len(index_x_)):
-                        for k in range(5):
+                        for k in range(core_num):
                             if (core_mem_all[k][index_x_[j]][1]>0):
                                 temp = core_mem_all[k][index_x_[j]][0]
                                 count_add_1+= np.nonzero(temp)[0][len(np.nonzero(temp)[0])-1]-1
@@ -43,7 +46,7 @@ class SCNN(nn.Module):
                 if len(index_l_)>0:
                     count_spike+=len(index_l_)
                     for j in range(len(index_l_)):
-                        for k in range(5):
+                        for k in range(core_num):
                             if (core_mem_all[k][index_l_[j]+784][1]>0):
                                 temp = core_mem_all[k][index_l_[j]+784][0]
                                 count_add_1+= np.nonzero(temp)[0][len(np.nonzero(temp)[0])-1]-1
@@ -69,7 +72,7 @@ for i in range(len(fc2_weight)):
     for j in range(len(fc2_weight[i])):
         weight_all[j+784,i+784+128]=fc2_weight[i][j]
 
-th = 0.1
+th = 0.12
 index1 = np.abs(weight_all) >= th
 index2 = np.abs(weight_all) < th
 index = weight_all.copy()
@@ -82,17 +85,16 @@ print('sparsity',p)
 snn.fc1.weight.data= torch.from_numpy(weight_all[0:784,784:912].T).float()
 snn.fc2.weight.data= torch.from_numpy(weight_all[784:912,912:922].T).float()
 
-core_size = 200
-core_num = 5
 
-# shuffle_ix = np.random.permutation(np.arange(core_num*core_size))
-# core_index = shuffle_ix.reshape((core_num,core_size))
 
-core_index = np.linspace(0, int(core_num*core_size)-1, int(core_num*core_size)).reshape((core_num,core_size))
-core_index = core_index.astype(np.int32)
+shuffle_ix = np.random.permutation(np.arange(core_num*core_size))
+core_index = shuffle_ix.reshape((core_num,core_size))
+
+# core_index = np.linspace(0, int(core_num*core_size)-1, int(core_num*core_size)).reshape((core_num,core_size))
+# core_index = core_index.astype(np.int32)
 
 core_mem_all=[]
-for i in range(5):
+for i in range(core_num):
     core_ = core_index[i,:]
     mem = []
     for j in range(922):
