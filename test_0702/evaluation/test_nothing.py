@@ -105,11 +105,11 @@ snn.fc2.weight.data= torch.from_numpy(weight_all[784:912,912:922].T).float()
 # core_index 表示每个核里对应的真实神经元id core_num*core_size
 # core_mem_all有5个mem，每个mem有922个[bitmap，num],bitmap长度为coresize
 
-shuffle_ix = np.random.permutation(np.arange(core_num*core_size))
-core_index = shuffle_ix.reshape((core_num,core_size))
+# shuffle_ix = np.random.permutation(np.arange(core_num*core_size))
+# core_index = shuffle_ix.reshape((core_num,core_size))
 
-# core_index = np.linspace(0, int(core_num*core_size)-1, int(core_num*core_size)).reshape((core_num,core_size))
-# core_index = core_index.astype(np.int32)
+core_index = np.linspace(0, int(core_num*core_size)-1, int(core_num*core_size)).reshape((core_num,core_size))
+core_index = core_index.astype(np.int32)
 
 core_mem_all=[]
 for i in range(core_num):
